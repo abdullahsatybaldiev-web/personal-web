@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin — Abdullah</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Site Admin</h1>
+
+      <div id="login-view" class="card">
+        <label for="password">Enter admin password</label>
+        <input id="password" type="password" autocomplete="new-password" />
+        <button id="login">Login</button>
+        <p class="hint">Password is stored client-side; change `admin.js` to update it.</p>
+      </div>
+
+      <div id="admin-view" class="hidden">
+        <section class="card">
+          <h2>Home content</h2>
+          <label>Intro</label>
+          <textarea id="admin-intro" rows="3"></textarea>
+          <label>Subtext</label>
+          <textarea id="admin-subtext" rows="2"></textarea>
+          <label>Skills (comma separated)</label>
+          <input id="admin-skills" />
+        </section>
+
+        <section class="card">
+          <h2>Images</h2>
+          <label>Hero image 1</label>
+          <select id="hero-1"></select>
+          <label>Hero image 2</label>
+          <select id="hero-2"></select>
+          <label>Hero image 3</label>
+          <select id="hero-3"></select>
+        </section>
+
+        <section class="card">
+          <h2>Colors</h2>
+          <label>Background</label>
+          <input type="color" id="color-bg" />
+          <label>Surface</label>
+          <input type="color" id="color-surface" />
+          <label>Accent</label>
+          <input type="color" id="color-accent" />
+          <label>Accent 2</label>
+          <input type="color" id="color-accent-2" />
+          <label>Text</label>
+          <input type="color" id="color-text" />
+        </section>
+
+        <div class="actions">
+          <button id="apply">Apply</button>
+          <button id="save">Save (persist)</button>
+          <button id="logout">Logout</button>
+        </div>
+
+        <p class="note">Changes are saved to your browser's localStorage and applied immediately. To make server-side persistent changes, update files in the repository.</p>
+      </div>
+    </main>
+    <script src="admin.js"></script>
+  </body>
+</html>
