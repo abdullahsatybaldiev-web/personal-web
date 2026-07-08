@@ -40,6 +40,27 @@
     }
   }
 
+  // Mouse forces: repulsion + curl (bending) for an interactive field
+  function applyMouseForces(){
+    if(mouse.x === null) return;
+    for(const n of nodes){
+      const dx = n.x - mouse.x, dy = n.y - mouse.y; const d = Math.sqrt(dx*dx + dy*dy) || 0.0001;
+      if(d < mouse.radius){
+        const pull = (1 - d / mouse.radius);
+        const repel = pull * 2.2; // repulsion strength
+        // push away from cursor
+        n.vx += (dx / d) * repel;
+        n.vy += (dy / d) * repel;
+        // add perpendicular curl to bend paths
+        const curl = pull * 0.9;
+        n.vx += -(dy / d) * curl;
+        n.vy += (dx / d) * curl;
+      }
+      // gentle damping
+      n.vx *= 0.985; n.vy *= 0.985;
+    }
+  }
+
   function step(){
     // subtle background overlay to create motion trails
     ctx.clearRect(0,0,w,h);
@@ -51,17 +72,10 @@
       n.x += n.vx; n.y += n.vy;
       if(n.x < -20) n.x = w + 20; if(n.x > w + 20) n.x = -20;
       if(n.y < -20) n.y = h + 20; if(n.y > h + 20) n.y = -20;
-
-      // mouse interaction - mild attraction
-      if(mouse.x !== null){
-        const dx = mouse.x - n.x; const dy = mouse.y - n.y; const d = Math.sqrt(dx*dx + dy*dy);
-        if(d < mouse.radius){
-          const f = (1 - d / mouse.radius) * 0.6;
-          n.vx += (dx / d) * f * 0.08;
-          n.vy += (dy / d) * f * 0.08;
-        }
-      }
     }
+
+    // apply interactive mouse forces so the network bends around the cursor
+    applyMouseForces();
 
     // draw links
     ctx.beginPath();
