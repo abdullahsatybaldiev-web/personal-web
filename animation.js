@@ -13,12 +13,12 @@
 
   // configuration for a constellation/network effect
   const cfg = {
-    count: 80,
-    linkDistance: 140,
-    nodeSize: 2.2,
-    speed: 0.3,
+    count: 120,
+    linkDistance: 200,
+    nodeSize: 2.8,
+    speed: 0.12,
     hue: 210,
-    bgAlpha: 0.06
+    bgAlpha: 0.03
   };
 
   const nodes = [];
@@ -77,18 +77,41 @@
     // apply interactive mouse forces so the network bends around the cursor
     applyMouseForces();
 
-    // draw links
-    ctx.beginPath();
+    // draw links and collect neighbors for triangular fills
+    const neighbors = new Array(nodes.length);
+    for(let i=0;i<nodes.length;i++) neighbors[i]=[];
     for(let i=0;i<nodes.length;i++){
       const a = nodes[i];
       for(let j=i+1;j<nodes.length;j++){
         const b = nodes[j];
         const dx = a.x - b.x, dy = a.y - b.y; const d = Math.sqrt(dx*dx + dy*dy);
         if(d < cfg.linkDistance){
-          const alpha = (1 - d / cfg.linkDistance) * 0.6 * Math.min(a.alpha, b.alpha);
-          ctx.strokeStyle = `hsla(${cfg.hue}, 20%, 80%, ${alpha})`;
-          ctx.lineWidth = 1;
+          const alpha = (1 - d / cfg.linkDistance) * 0.85 * Math.min(a.alpha, b.alpha);
+          ctx.strokeStyle = `hsla(${cfg.hue}, 10%, 95%, ${alpha})`;
+          ctx.lineWidth = 0.9;
           ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          neighbors[i].push(j);
+          neighbors[j].push(i);
+        }
+      }
+    }
+
+    // draw faint triangular fills for nearby neighbor triplets
+    for(let i=0;i<nodes.length;i++){
+      const a = nodes[i];
+      const nb = neighbors[i];
+      if(nb.length < 2) continue;
+      for(let m=0;m<nb.length;m++){
+        for(let nIdx=m+1;nIdx<nb.length;nIdx++){
+          const j = nb[m], k = nb[nIdx];
+          const b = nodes[j], c = nodes[k];
+          // check triangle compactness
+          const d1 = Math.hypot(a.x-b.x,a.y-b.y), d2 = Math.hypot(a.x-c.x,a.y-c.y), d3 = Math.hypot(b.x-c.x,b.y-c.y);
+          if(d1 < cfg.linkDistance*0.7 && d2 < cfg.linkDistance*0.7 && d3 < cfg.linkDistance*0.9){
+            const alpha = 0.02 * Math.min(a.alpha, b.alpha, c.alpha);
+            ctx.fillStyle = `hsla(${cfg.hue}, 10%, 95%, ${alpha})`;
+            ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.closePath(); ctx.fill();
+          }
         }
       }
     }
